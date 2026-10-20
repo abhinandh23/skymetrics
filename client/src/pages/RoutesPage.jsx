@@ -14,6 +14,7 @@ import { usePageParams } from '../hooks/usePagedQuery.js';
 import { formatInt, formatMinutes, formatMonth, formatPct, humanize } from '../lib/format.js';
 
 const PAGE_SIZE = 25;
+const MIN_FLIGHTS = ['50', '200', '500', '1000'];
 const FORMATS = {
   flights: formatInt,
   onTimePct: (v) => formatPct(v),
@@ -25,22 +26,28 @@ const FORMATS = {
 export function RoutesPage() {
   const { month } = useFilters();
   const { data: options } = useFilterOptions();
-  const { get, set } = usePageParams({ sort: '-avgArrDelay', page: '1', airport: '' });
+  const { get, set } = usePageParams({
+    sort: '-avgArrDelay',
+    page: '1',
+    airport: '',
+    minFlights: '200',
+  });
   const [airportInput, setAirportInput] = useState(get('airport'));
   const effectiveMonth = month || options.months.at(-1) || '';
   const sort = get('sort');
   const page = Number(get('page'));
   const airport = get('airport');
+  const minFlights = get('minFlights');
 
   const { data, error, loading } = useApi(
     (signal) =>
       effectiveMonth
         ? kpiApi.routes(
-            { month: effectiveMonth, sort, page, limit: PAGE_SIZE, airport },
+            { month: effectiveMonth, sort, page, limit: PAGE_SIZE, airport, minFlights },
             { signal },
           )
         : Promise.resolve(null),
-    [effectiveMonth, sort, page, airport],
+    [effectiveMonth, sort, page, airport, minFlights],
   );
 
   const metric = sort.replace(/^-/, '');
@@ -60,7 +67,21 @@ export function RoutesPage() {
         description={`Origin–destination pairs with at least 50 flights · ${formatMonth(effectiveMonth)}`}
       >
         <div className="flex flex-wrap items-center gap-3">
-          <FilterBar showAirline={false} />
+          <FilterBar showAirline={false} fallbackMonth={effectiveMonth} />
+          <label className="flex items-center gap-2 text-sm text-ink-2">
+            Min. flights
+            <select
+              className="rounded-lg border border-line bg-surface px-3 py-1.5 text-sm"
+              value={minFlights}
+              onChange={(e) => set({ minFlights: e.target.value, page: '1' })}
+            >
+              {MIN_FLIGHTS.map((n) => (
+                <option key={n} value={n}>
+                  {formatInt(Number(n))}
+                </option>
+              ))}
+            </select>
+          </label>
           <form onSubmit={applyAirport} className="flex items-center gap-2 text-sm text-ink-2">
             <label htmlFor="route-airport">Airport</label>
             <input
@@ -69,7 +90,7 @@ export function RoutesPage() {
               onChange={(e) => setAirportInput(e.target.value)}
               placeholder="e.g. JFK"
               maxLength={3}
-              className="w-20 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm uppercase"
+              className="w-20 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm uppercase placeholder:normal-case"
             />
             <button
               type="submit"
