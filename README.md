@@ -4,11 +4,11 @@
 
 SkyMetrics runs a PySpark pipeline over the U.S. Bureau of Transportation Statistics (BTS) on-time dataset and writes compact KPI collections to MongoDB. A MERN app serves interactive dashboards on top of them. Analysts can also ask questions in plain English, such as *"Which 5 routes had the worst average arrival delay in July 2026?"*. Gemini translates the question into a MongoDB aggregation pipeline, and an allow-list validator checks that pipeline before it runs read-only.
 
-| Overview | Ask your data |
+| Overview | Delay causes |
 | --- | --- |
-| ![Overview dashboard](docs/screenshots/overview.png) | ![Ask your data](docs/screenshots/ask.png) |
-
-> Screenshots: add them to `docs/screenshots/` (placeholders).
+| ![Overview dashboard](docs/screenshots/overview.png) | ![Delay causes](docs/screenshots/delay-causes.png) |
+| **Airlines** | **Routes** |
+| ![Airline comparison](docs/screenshots/airlines.png) | ![Routes table and chart](docs/screenshots/routes.png) |
 
 ---
 
