@@ -102,6 +102,9 @@ export async function askQuestion({ question, user, llm, maxTimeMS }) {
         attempts,
         durationMs: Date.now() - started,
       });
+      if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
+        throw new HttpError(504, 'The language model took too long to respond. Please try again.');
+      }
       throw new HttpError(
         502,
         'The language model is unavailable right now. Please try again shortly.',

@@ -162,6 +162,14 @@ describe('POST /api/ask', () => {
     expect(log).toMatchObject({ outcome: 'llm_error', error: 'quota exceeded' });
   });
 
+  test('returns 504 when the LLM call times out', async () => {
+    const timeout = Object.assign(new Error('The operation was aborted due to timeout'), {
+      name: 'TimeoutError',
+    });
+    const res = await ask(createApp({ llm: fakeLlm(timeout) }), 'Which routes are worst?');
+    expect(res.status).toBe(504);
+  });
+
   test('returns 422 when a valid-looking pipeline fails at runtime', async () => {
     const llm = fakeLlm({
       ...worstRoutesAnswer,

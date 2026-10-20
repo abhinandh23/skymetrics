@@ -160,7 +160,11 @@ describe('LLM helpers', () => {
     expect(generateContent).toHaveBeenCalledWith({
       model: 'test-model',
       contents: 'p',
-      config: { systemInstruction: 'sys', responseMimeType: 'application/json' },
+      config: {
+        systemInstruction: 'sys',
+        responseMimeType: 'application/json',
+        abortSignal: expect.any(AbortSignal),
+      },
     });
   });
 
