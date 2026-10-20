@@ -2,3 +2,5 @@ pyspark==3.5.8
 pandas==2.2.3
 pymongo==4.10.1
 python-dotenv==1.0.1
+# PySpark 3.5 imports distutils in toPandas(); Python 3.12 removed it, setuptools provides it.
+setuptools==75.8.0
