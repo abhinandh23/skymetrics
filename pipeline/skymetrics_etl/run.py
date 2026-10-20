@@ -15,6 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 from pymongo import MongoClient
+from pyspark.sql import SparkSession
 
 from .aggregate import all_aggregates
 from .clean import clean, read_raw
@@ -64,6 +65,7 @@ def main(argv: list[str] | None = None) -> dict:
 
     started = time.perf_counter()
     started_at = datetime.now(timezone.utc)
+    owns_spark = SparkSession.getActiveSession() is None
     spark = build_spark(settings.spark_master, settings.spark_driver_memory)
 
     collected: dict[str, list[pd.DataFrame]] = {}
@@ -78,8 +80,10 @@ def main(argv: list[str] | None = None) -> dict:
         for label, ym, local_csv in sources:
             month_started = time.perf_counter()
             csv_path = local_csv or download_month(*ym, settings.raw_dir, settings.min_free_gb)
+            download_seconds = time.perf_counter() - month_started
             try:
                 frames, rows_read, rows_clean = process_csv(spark, csv_path)
+                process_seconds = time.perf_counter() - month_started - download_seconds
             finally:
                 if local_csv is None:
                     csv_path.unlink(missing_ok=True)  # never keep raw data around
@@ -95,12 +99,14 @@ def main(argv: list[str] | None = None) -> dict:
                     "month": label,
                     "rowsRead": rows_read,
                     "rowsClean": rows_clean,
-                    "seconds": round(time.perf_counter() - month_started, 1),
+                    "downloadSeconds": round(download_seconds, 1),
+                    "processSeconds": round(process_seconds, 1),
                 }
             )
             log.info("%s: read %d rows, kept %d", label, rows_read, rows_clean)
     finally:
-        spark.stop()
+        if owns_spark:
+            spark.stop()
 
     final = {name: pd.concat(parts, ignore_index=True) for name, parts in collected.items()}
     run = {
@@ -109,6 +115,8 @@ def main(argv: list[str] | None = None) -> dict:
         "rowsRead": sum(m["rowsRead"] for m in per_month),
         "rowsAfterCleaning": sum(m["rowsClean"] for m in per_month),
         "perMonth": per_month,
+        "downloadSeconds": round(sum(m["downloadSeconds"] for m in per_month), 1),
+        "processSeconds": round(sum(m["processSeconds"] for m in per_month), 1),
         "documents": {name: len(frame) for name, frame in final.items()},
     }
 
@@ -121,11 +129,14 @@ def main(argv: list[str] | None = None) -> dict:
     run["runtimeSeconds"] = round(time.perf_counter() - started, 1)
 
     log.info(
-        "DONE: %d rows read, %d rows after cleaning, %d months, %.1fs total, documents=%s",
+        "DONE: %d rows read, %d rows after cleaning, %d months, "
+        "%.1fs total (%.1fs download, %.1fs Spark processing), documents=%s",
         run["rowsRead"],
         run["rowsAfterCleaning"],
         len(per_month),
         run["runtimeSeconds"],
+        run["downloadSeconds"],
+        run["processSeconds"],
         run["documents"],
     )
     return run
