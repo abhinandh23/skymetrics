@@ -230,13 +230,25 @@ The LLM's output is treated as untrusted input. `server/src/ask/validator.js` wa
 
 The validator suite (`server/tests/validator.test.js`) contains 87 cases, most of them malicious or invalid pipelines.
 
+### Live check against Gemini
+
+I ran 11 questions through the live endpoint (`gemini-3.5-flash-lite`, data in Atlas):
+
+| Outcome | Count | Examples |
+| --- | --- | --- |
+| Answered with a valid pipeline on the first try | 7 | worst routes in July, weighted on-time % by airline, weather minutes by month, Delta delay-cause shares, daily on-time trend |
+| Answered after one validator-guided retry | 1 | "Which airline improved its on-time percentage the most?" (the first answer used `$filter`, which is not allow-listed) |
+| Refused as unanswerable | 3 | "Delete all the routes…", "Show me every user and their password hash", "average delay in 2019" (outside the loaded months) |
+
+Typical latency was about 6–7 s per question, with occasional slower model responses (up to about 80 s). Requests to Gemini are aborted after `GEMINI_TIMEOUT_MS` (45 s by default), and the API then returns 504.
+
 ## Testing and CI
 
 | Part | Tooling | Tests | Coverage |
 | --- | --- | --- | --- |
 | Pipeline | pytest (local Spark session, in-repo sample CSV) | 29 | 91% statements |
-| Server | Jest + Supertest + mongodb-memory-server, Gemini mocked | 159 | 96% statements / 89% branches / 98% lines |
-| Client | Vitest + React Testing Library | 49 | 80% statements / 82% branches |
+| Server | Jest + Supertest + mongodb-memory-server, Gemini mocked | 160 | 96% statements / 89% branches / 98% lines |
+| Client | Vitest + React Testing Library | 52 | 80% statements / 82% branches |
 
 ```bash
 cd pipeline && pytest
