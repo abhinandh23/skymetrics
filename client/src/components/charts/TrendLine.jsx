@@ -32,7 +32,7 @@ export function TrendLine({
         <YAxis
           {...axisProps}
           axisLine={false}
-          width={56}
+          width={68}
           tickFormatter={valueFormat}
           domain={yDomain ?? ['auto', 'auto']}
         />
