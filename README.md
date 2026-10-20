@@ -10,6 +10,10 @@ SkyMetrics runs a PySpark pipeline over the U.S. Bureau of Transportation Statis
 | **Airlines** | **Routes** |
 | ![Airline comparison](docs/screenshots/airlines.png) | ![Routes table and chart](docs/screenshots/routes.png) |
 
+**Ask your data** — a live Gemini answer: validated pipeline, auto-chosen chart, result table and the generated pipeline:
+
+![Ask your data](docs/screenshots/ask.png)
+
 ---
 
 ## Contents
