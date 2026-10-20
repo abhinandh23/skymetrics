@@ -20,6 +20,7 @@ def test_process_csv_returns_pandas_frames(spark):
         "airport_monthly",
         "route_monthly",
         "delay_causes_monthly",
+        "carrier_daily",
     }
     assert len(frames["carrier_monthly"]) == 4
 

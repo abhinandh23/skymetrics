@@ -3,6 +3,7 @@ import pytest
 
 from skymetrics_etl.aggregate import (
     airport_monthly,
+    carrier_daily,
     carrier_monthly,
     delay_causes_monthly,
     route_monthly,
@@ -73,9 +74,20 @@ def test_records_from_pandas_converts_to_native_types():
 
 
 @pytest.mark.parametrize(
-    "builder", [carrier_monthly, airport_monthly, route_monthly, delay_causes_monthly]
+    "builder",
+    [carrier_monthly, airport_monthly, route_monthly, delay_causes_monthly, carrier_daily],
 )
 def test_aggregates_have_no_decimal_columns(flights, builder):
     """Decimal columns would not serialise to BSON; every metric must be a double or integer."""
     types = dict(builder(flights).dtypes)
     assert not [name for name, t in types.items() if t.startswith("decimal")]
+
+
+def test_carrier_daily(flights):
+    rows = by_key(carrier_daily(flights), "date", "airline")
+    assert len(rows) == 14  # every cleaned sample row is on a distinct date
+    jun2 = rows[("2026-06-02", "AA")]
+    assert jun2["month"] == "2026-06"
+    assert jun2["flights"] == 1
+    assert jun2["onTimePct"] == 0.0
+    assert rows[("2026-06-04", "AA")]["cancelPct"] == 100.0

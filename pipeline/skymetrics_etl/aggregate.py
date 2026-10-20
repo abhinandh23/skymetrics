@@ -75,6 +75,20 @@ def route_monthly(flights: DataFrame, min_flights: int = MIN_ROUTE_FLIGHTS) -> D
     )
 
 
+def carrier_daily(flights: DataFrame) -> DataFrame:
+    """Per airline per day; small enough to power the daily trend charts."""
+    register_flights(flights)
+    return flights.sparkSession.sql(
+        f"""
+        SELECT DATE_FORMAT(flight_date, 'yyyy-MM-dd') AS date, month, airline,
+            {_COMMON_COUNTS}, {_ARRIVAL_METRICS}
+        FROM {FLIGHTS_VIEW}
+        GROUP BY flight_date, month, airline
+        ORDER BY date, airline
+        """
+    )
+
+
 def delay_causes_monthly(flights: DataFrame) -> DataFrame:
     causes = {
         "carrier_delay": "carrierMin",
@@ -96,4 +110,5 @@ def all_aggregates(flights: DataFrame, min_route_flights: int = MIN_ROUTE_FLIGHT
         "airport_monthly": airport_monthly(flights),
         "route_monthly": route_monthly(flights, min_route_flights),
         "delay_causes_monthly": delay_causes_monthly(flights),
+        "carrier_daily": carrier_daily(flights),
     }

@@ -34,6 +34,10 @@ INDEXES: dict[str, list[IndexSpec]] = {
     "delay_causes_monthly": [
         ([("month", ASCENDING), ("airline", ASCENDING)], {"unique": True}),
     ],
+    "carrier_daily": [
+        ([("date", ASCENDING), ("airline", ASCENDING)], {"unique": True}),
+        ([("month", ASCENDING)], {}),
+    ],
 }
 
 
