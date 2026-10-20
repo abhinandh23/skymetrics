@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { kpiApi } from '../api/endpoints.js';
 import { Card } from '../components/Card.jsx';
+import { NAME_AXIS_WIDTH } from '../components/charts/chartTheme.jsx';
 import { HBarChart } from '../components/charts/HBarChart.jsx';
 import { DataTable } from '../components/DataTable.jsx';
 import { FilterBar } from '../components/FilterBar.jsx';
@@ -75,6 +76,7 @@ export function AirlinesPage() {
               label={m.label}
               valueFormat={m.format}
               categoryFormat={nameOf}
+              categoryWidth={NAME_AXIS_WIDTH}
               highlight={airline || undefined}
             />
           </Card>

@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import { seriesColor } from '../../lib/chart.js';
-import { axisProps, gridProps, legendProps, tooltipProps } from './chartTheme.js';
+import { axisProps, gridProps, legendProps, tooltipProps } from './chartTheme.jsx';
 
 /**
  * Time-series line chart (one y-axis only; series must share a unit).

@@ -14,7 +14,7 @@ import {
 import { pickChart, seriesColor } from '../../lib/chart.js';
 import { formatValue, humanize } from '../../lib/format.js';
 import { KpiCard } from '../KpiCard.jsx';
-import { axisProps, gridProps, legendProps, tooltipProps } from './chartTheme.js';
+import { axisProps, gridProps, legendProps, tooltipProps } from './chartTheme.jsx';
 import { TrendLine } from './TrendLine.jsx';
 
 const fmt = (v) => formatValue(v);

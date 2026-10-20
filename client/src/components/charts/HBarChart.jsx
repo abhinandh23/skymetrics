@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { axisProps, gridProps, tooltipProps } from './chartTheme.js';
+import { axisProps, gridProps, tooltipProps } from './chartTheme.jsx';
 
 /**
  * Horizontal single-series bar chart. One color for every bar (the categories are nominal);
@@ -22,6 +22,7 @@ export function HBarChart({
   label,
   valueFormat = String,
   categoryFormat = String,
+  categoryWidth = 110,
   highlight,
 }) {
   const height = Math.max(120, data.length * 26 + 40);
@@ -39,7 +40,7 @@ export function HBarChart({
           type="category"
           dataKey={categoryKey}
           {...axisProps}
-          width={110}
+          width={categoryWidth}
           tickFormatter={categoryFormat}
           interval={0}
         />

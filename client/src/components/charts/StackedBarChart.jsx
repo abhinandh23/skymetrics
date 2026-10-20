@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 import { seriesColor } from '../../lib/chart.js';
-import { axisProps, gridProps, legendProps, tooltipProps } from './chartTheme.js';
+import { axisProps, gridProps, legendProps, NAME_AXIS_WIDTH, tooltipProps } from './chartTheme.jsx';
 
 /**
  * Horizontal stacked bars with a 2px surface gap between segments.
@@ -21,6 +21,7 @@ export function StackedBarChart({
   series,
   valueFormat = String,
   categoryFormat = String,
+  categoryWidth = NAME_AXIS_WIDTH,
 }) {
   const height = Math.max(160, data.length * 28 + 70);
   return (
@@ -37,7 +38,7 @@ export function StackedBarChart({
           type="category"
           dataKey={categoryKey}
           {...axisProps}
-          width={110}
+          width={categoryWidth}
           tickFormatter={categoryFormat}
           interval={0}
         />

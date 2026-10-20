@@ -19,8 +19,14 @@ export const tooltipProps = {
   itemStyle: { color: 'var(--ink)' },
 };
 
+/** Legends keep series order (no alphabetical sort) and use text ink, not the series color. */
 export const legendProps = {
   iconType: 'circle',
   iconSize: 8,
-  wrapperStyle: { fontSize: 12, color: 'var(--ink-2)' },
+  itemSorter: null,
+  wrapperStyle: { fontSize: 12 },
+  formatter: (value) => <span style={{ color: 'var(--ink-2)' }}>{value}</span>,
 };
+
+/** Width of a category axis that shows airline names. */
+export const NAME_AXIS_WIDTH = 140;
