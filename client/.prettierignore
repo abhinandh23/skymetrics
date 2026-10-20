@@ -1,3 +1,4 @@
 dist
+nginx.conf.template
 coverage
 node_modules
