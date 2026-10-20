@@ -1,5 +1,7 @@
 # SkyMetrics
 
+[![CI](https://github.com/abhinandh23/skymetrics/actions/workflows/ci.yml/badge.svg)](https://github.com/abhinandh23/skymetrics/actions/workflows/ci.yml)
+
 **Aviation analytics dashboard over real US airline on-time performance data, with a natural-language "Ask your data" feature.**
 
 SkyMetrics runs a PySpark pipeline over the U.S. Bureau of Transportation Statistics (BTS) on-time dataset and writes compact KPI collections to MongoDB. A MERN app serves interactive dashboards on top of them. Analysts can also ask questions in plain English, such as *"Which 5 routes had the worst average arrival delay in July 2026?"*. Gemini translates the question into a MongoDB aggregation pipeline, and an allow-list validator checks that pipeline before it runs read-only.
