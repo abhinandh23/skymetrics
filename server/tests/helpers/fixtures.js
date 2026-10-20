@@ -1,0 +1,202 @@
+const carrier = (month, airline, flights, completed, onTimePct, avgArrDelay, cancelled = 0) => ({
+  month,
+  airline,
+  flights,
+  completed,
+  cancelled,
+  diverted: flights - completed - cancelled,
+  cancelPct: Math.round((10000 * cancelled) / flights) / 100,
+  divertPct: Math.round((10000 * (flights - completed - cancelled)) / flights) / 100,
+  onTimePct,
+  avgArrDelay,
+  avgDepDelay: avgArrDelay + 2,
+});
+
+export const CARRIER_MONTHLY = [
+  carrier('2026-06', 'AA', 1000, 950, 80, 10, 40),
+  carrier('2026-06', 'DL', 3000, 2990, 90, 2, 10),
+  carrier('2026-06', 'UA', 2000, 1900, 70, 20, 80),
+  carrier('2026-07', 'AA', 1100, 1000, 75, 12, 90),
+  carrier('2026-07', 'DL', 3100, 3000, 88, 4, 50),
+  carrier('2026-07', 'UA', 2100, 2000, 72, 15, 60),
+];
+
+export const AIRPORT_MONTHLY = [
+  {
+    month: '2026-06',
+    airport: 'ATL',
+    flights: 3000,
+    completed: 2950,
+    cancelled: 30,
+    diverted: 20,
+    cancelPct: 1,
+    divertPct: 0.67,
+    onTimeDepPct: 85,
+    avgDepDelay: 8,
+  },
+  {
+    month: '2026-06',
+    airport: 'JFK',
+    flights: 1500,
+    completed: 1400,
+    cancelled: 80,
+    diverted: 20,
+    cancelPct: 5.33,
+    divertPct: 1.33,
+    onTimeDepPct: 70,
+    avgDepDelay: 18,
+  },
+  {
+    month: '2026-07',
+    airport: 'ATL',
+    flights: 3100,
+    completed: 3000,
+    cancelled: 60,
+    diverted: 40,
+    cancelPct: 1.94,
+    divertPct: 1.29,
+    onTimeDepPct: 82,
+    avgDepDelay: 9,
+  },
+];
+
+export const ROUTE_MONTHLY = [
+  {
+    month: '2026-06',
+    origin: 'JFK',
+    dest: 'LAX',
+    route: 'JFK-LAX',
+    flights: 300,
+    completed: 290,
+    cancelled: 8,
+    diverted: 2,
+    cancelPct: 2.67,
+    divertPct: 0.67,
+    onTimePct: 70,
+    avgArrDelay: 25,
+    avgDepDelay: 20,
+    distance: 2475,
+  },
+  {
+    month: '2026-06',
+    origin: 'ATL',
+    dest: 'JFK',
+    route: 'ATL-JFK',
+    flights: 200,
+    completed: 198,
+    cancelled: 2,
+    diverted: 0,
+    cancelPct: 1,
+    divertPct: 0,
+    onTimePct: 85,
+    avgArrDelay: 5,
+    avgDepDelay: 6,
+    distance: 760,
+  },
+  {
+    month: '2026-07',
+    origin: 'JFK',
+    dest: 'LAX',
+    route: 'JFK-LAX',
+    flights: 310,
+    completed: 300,
+    cancelled: 5,
+    diverted: 5,
+    cancelPct: 1.61,
+    divertPct: 1.61,
+    onTimePct: 74,
+    avgArrDelay: 18,
+    avgDepDelay: 15,
+    distance: 2475,
+  },
+];
+
+export const DELAY_CAUSES_MONTHLY = [
+  {
+    month: '2026-06',
+    airline: 'AA',
+    flights: 1000,
+    carrierMin: 500,
+    weatherMin: 100,
+    nasMin: 300,
+    securityMin: 0,
+    lateAircraftMin: 600,
+    totalDelayMin: 1500,
+  },
+  {
+    month: '2026-06',
+    airline: 'DL',
+    flights: 3000,
+    carrierMin: 400,
+    weatherMin: 50,
+    nasMin: 200,
+    securityMin: 10,
+    lateAircraftMin: 300,
+    totalDelayMin: 960,
+  },
+];
+
+export const CARRIER_DAILY = [
+  {
+    date: '2026-06-01',
+    month: '2026-06',
+    airline: 'AA',
+    flights: 30,
+    completed: 29,
+    cancelled: 1,
+    diverted: 0,
+    cancelPct: 3.33,
+    divertPct: 0,
+    onTimePct: 80,
+    avgArrDelay: 9,
+    avgDepDelay: 10,
+  },
+  {
+    date: '2026-06-01',
+    month: '2026-06',
+    airline: 'DL',
+    flights: 100,
+    completed: 100,
+    cancelled: 0,
+    diverted: 0,
+    cancelPct: 0,
+    divertPct: 0,
+    onTimePct: 90,
+    avgArrDelay: 1,
+    avgDepDelay: 3,
+  },
+  {
+    date: '2026-06-02',
+    month: '2026-06',
+    airline: 'AA',
+    flights: 32,
+    completed: 32,
+    cancelled: 0,
+    diverted: 0,
+    cancelPct: 0,
+    divertPct: 0,
+    onTimePct: 70,
+    avgArrDelay: 15,
+    avgDepDelay: 16,
+  },
+];
+
+export async function seedKpis(db) {
+  const data = {
+    carrier_monthly: CARRIER_MONTHLY,
+    airport_monthly: AIRPORT_MONTHLY,
+    route_monthly: ROUTE_MONTHLY,
+    delay_causes_monthly: DELAY_CAUSES_MONTHLY,
+    carrier_daily: CARRIER_DAILY,
+  };
+  for (const [name, docs] of Object.entries(data)) {
+    await db.collection(name).deleteMany({});
+    await db.collection(name).insertMany(docs.map((d) => ({ ...d })));
+  }
+  await db.collection('pipeline_runs').insertOne({
+    startedAt: new Date('2026-10-01T00:00:00Z'),
+    months: ['2026-06', '2026-07'],
+    rowsRead: 12345,
+    rowsAfterCleaning: 12340,
+  });
+}
