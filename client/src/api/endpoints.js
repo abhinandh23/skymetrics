@@ -24,5 +24,6 @@ export const kpiApi = {
 };
 
 export const askApi = {
-  ask: (question) => api.post('/ask', { question }).then((r) => r.data),
+  // Two model calls (answer + one retry) plus the query can take a while.
+  ask: (question) => api.post('/ask', { question }, { timeout: 120_000 }).then((r) => r.data),
 };
