@@ -12,7 +12,11 @@ await connect({
 });
 
 const llm = env.GEMINI_API_KEY
-  ? createGeminiClient({ apiKey: env.GEMINI_API_KEY, model: env.GEMINI_MODEL })
+  ? createGeminiClient({
+      apiKey: env.GEMINI_API_KEY,
+      model: env.GEMINI_MODEL,
+      timeoutMs: env.GEMINI_TIMEOUT_MS,
+    })
   : null;
 if (!llm) console.warn('GEMINI_API_KEY is not set: POST /api/ask will return 503.');
 

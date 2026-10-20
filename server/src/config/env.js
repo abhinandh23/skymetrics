@@ -25,6 +25,7 @@ const schema = z.object({
   JWT_EXPIRES_IN: z.string().default('8h'),
   GEMINI_API_KEY: z.string().optional(),
   GEMINI_MODEL: z.string().min(1).default('gemini-3.5-flash-lite'),
+  GEMINI_TIMEOUT_MS: z.coerce.number().int().positive().default(45_000),
   CLIENT_ORIGIN: z.string().default('http://localhost:5173').transform(csv),
   RATE_LIMIT_PER_15_MIN: z.coerce.number().int().positive().default(300),
   ASK_RATE_LIMIT_PER_MIN: z.coerce.number().int().positive().default(10),
