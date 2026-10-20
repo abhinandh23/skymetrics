@@ -253,17 +253,17 @@ The GitHub Actions workflow `.github/workflows/ci.yml` runs on every push and pu
 
 ## Pipeline metrics
 
-Measured on a laptop (`local[4]`, 2 GB driver memory) for June to August 2026:
+Measured on the run that loaded MongoDB Atlas (laptop, `local[4]`, 2 GB driver memory, June to August 2026):
 
 | Metric | Value |
 | --- | --- |
 | Flight records read | **1,847,936** (607,577 + 631,970 + 608,389) |
 | Rows after cleaning | 1,847,936 (no rows failed validation in these months) |
-| Spark processing time (clean + aggregate, 3 months) | **13.1 s** |
-| Download + unzip time | 208.8 s (about 97 MB of zipped data) |
-| Total run time | 224.2 s |
+| Spark processing time (clean + aggregate, 3 months) | **15.1 s** |
+| Download + unzip time | 228.7 s (about 97 MB zipped, 798.5 MB of CSV; each CSV deleted after processing) |
+| Total run time (including the Atlas load) | 264.7 s |
 | KPI documents written | 12,959 (36 carrier, 1,055 airport, 10,728 route, 36 delay-cause and 1,104 daily documents) |
-| MongoDB footprint (data + indexes) | about 3.9 MB |
+| MongoDB Atlas footprint | 3.16 MB data + 1.26 MB indexes (under 1% of the 512 MB free tier) |
 
 The live numbers for each run are stored in the `pipeline_runs` collection, and the Overview page footer shows them.
 
