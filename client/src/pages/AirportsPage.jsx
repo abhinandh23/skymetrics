@@ -51,7 +51,7 @@ export function AirportsPage() {
         description={`Departure performance by origin airport · ${formatMonth(effectiveMonth)}`}
       >
         <div className="flex flex-wrap items-center gap-3">
-          <FilterBar showAirline={false} />
+          <FilterBar showAirline={false} fallbackMonth={effectiveMonth} />
           <label className="flex items-center gap-2 text-sm text-ink-2">
             Min. flights
             <select

@@ -5,8 +5,11 @@ import { formatMonth } from '../lib/format.js';
 const selectClass =
   'rounded-lg border border-line bg-surface px-3 py-1.5 text-sm text-ink focus:outline-2 focus:outline-accent';
 
-/** Global month/airline filters, synced to the URL. */
-export function FilterBar({ showAirline = true }) {
+/**
+ * Global month/airline filters, synced to the URL.
+ * Pages that always show a single month pass `fallbackMonth`; "All months" is then hidden.
+ */
+export function FilterBar({ showAirline = true, fallbackMonth }) {
   const { month, airline, setFilter, setFilters } = useFilters();
   const { data } = useFilterOptions();
 
@@ -16,10 +19,10 @@ export function FilterBar({ showAirline = true }) {
         Month
         <select
           className={selectClass}
-          value={month}
+          value={month || fallbackMonth || ''}
           onChange={(e) => setFilter('month', e.target.value)}
         >
-          <option value="">All months</option>
+          {!fallbackMonth && <option value="">All months</option>}
           {data.months.map((m) => (
             <option key={m} value={m}>
               {formatMonth(m)}
