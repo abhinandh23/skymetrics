@@ -123,7 +123,7 @@ sequenceDiagram
 ### Prerequisites
 
 - Node.js 20+ (developed on 24), Python 3.10+ (developed on 3.12), Java 11 or 17 (for Spark).
-- A MongoDB Atlas cluster (the free M0 tier is plenty; the KPI collections use about 4 MB) and a Gemini API key from Google AI Studio.
+- A MongoDB Atlas cluster (the free M0 tier is plenty; the KPI collections use about 4.4 MB) and a Gemini API key from Google AI Studio.
 
 ### 1. Configure
 
@@ -269,7 +269,7 @@ The live numbers for each run are stored in the `pipeline_runs` collection, and 
 
 ## Design decisions
 
-- **Aggregate in Spark and store only KPIs in MongoDB.** About 1.85 million raw rows become roughly 13k documents (3.9 MB). That fits the 512 MB Atlas free tier with room to spare and keeps every dashboard query an indexed lookup.
+- **Aggregate in Spark and store only KPIs in MongoDB.** About 1.85 million raw rows (798.5 MB of CSV) become 12,959 documents (4.4 MB including indexes). That fits the 512 MB Atlas free tier with room to spare and keeps every dashboard query an indexed lookup.
 - **No Spark writes to disk.** Results go through `toPandas()` and `pymongo`, so the pipeline works on Windows without `winutils`/`HADOOP_HOME`. The Spark session also forces `fs.defaultFS=file:///`, so a local Hadoop configuration pointing at HDFS cannot hijack file reads.
 - **PySpark 3.5 on Java 11.** PySpark 3.5 supports Java 8, 11 and 17, so no extra JDK is needed locally, and CI tests on Java 17. `setuptools` is pinned because PySpark 3.5's `toPandas()` imports `distutils`, which Python 3.12 removed.
 - **One month at a time, then delete.** At most one raw CSV (about 260 MB) is on disk at any moment, and there is a free-space check before each download.
