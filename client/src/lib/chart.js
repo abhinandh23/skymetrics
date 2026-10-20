@@ -1,3 +1,5 @@
+import { humanize } from './format.js';
+
 /**
  * Decide how to draw an arbitrary result set (used by "Ask your data").
  * The model's hints are respected when they are consistent with the data; otherwise
@@ -25,12 +27,24 @@ export const isTimeField = (rows, field) =>
 
 /**
  * @param {{ rows: object[], chartType?: string, xField?: string | null, yFields?: string[] | null }} input
- * @returns {{ type: 'empty' | 'table' | 'stat' | 'bar' | 'line' | 'pie', xField?: string, yFields?: string[] }}
+ * @returns {{ type: 'empty' | 'table' | 'stat' | 'bar' | 'line' | 'pie', xField?: string, yFields?: string[], rows?: object[] }}
+ *   `rows` is set when the data was reshaped for charting.
  */
 export function pickChart({ rows, chartType, xField, yFields }) {
   if (!rows?.length) return { type: 'empty' };
   const fields = Object.keys(rows[0]);
   const numeric = fields.filter((f) => isNumeric(rows, f));
+
+  // One wide row whose hinted columns are parts of something (e.g. share per cause):
+  // pivot the columns into label/value rows so they can be compared.
+  const hinted = (yFields ?? []).filter((f) => numeric.includes(f));
+  if (rows.length === 1 && hinted.length >= 2 && chartType !== 'table') {
+    const pivoted = hinted
+      .slice(0, MAX_PIE_SLICES)
+      .map((f) => ({ label: humanize(f), value: rows[0][f] }));
+    const pie = chartType === 'pie' && pivoted.every((r) => (r.value ?? 0) >= 0);
+    return { type: pie ? 'pie' : 'bar', xField: 'label', yFields: ['value'], rows: pivoted };
+  }
 
   if (rows.length === 1 && numeric.length >= 1 && fields.length <= 3) {
     return { type: 'stat', yFields: numeric.slice(0, 2) };

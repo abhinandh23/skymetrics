@@ -25,6 +25,7 @@ const fmt = (v) => formatValue(v);
  */
 export function ResultChart({ rows, chartType, xField, yFields }) {
   const choice = pickChart({ rows, chartType, xField, yFields });
+  const data = choice.rows ?? rows;
 
   if (choice.type === 'stat') {
     return (
@@ -42,7 +43,7 @@ export function ResultChart({ rows, chartType, xField, yFields }) {
     return (
       <div data-testid="chart-line">
         <TrendLine
-          data={rows}
+          data={data}
           xKey={choice.xField}
           series={series}
           valueFormat={fmt}
@@ -59,7 +60,7 @@ export function ResultChart({ rows, chartType, xField, yFields }) {
         <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
-              data={rows}
+              data={data}
               dataKey={y.key}
               nameKey={choice.xField}
               innerRadius="55%"
@@ -68,7 +69,7 @@ export function ResultChart({ rows, chartType, xField, yFields }) {
               strokeWidth={2}
               isAnimationActive={false}
             >
-              {rows.map((row, i) => (
+              {data.map((row, i) => (
                 <Cell key={String(row[choice.xField])} fill={seriesColor(i)} />
               ))}
             </Pie>
@@ -81,12 +82,12 @@ export function ResultChart({ rows, chartType, xField, yFields }) {
   }
 
   if (choice.type === 'bar') {
-    const height = Math.max(160, rows.length * (series.length * 14 + 12) + 60);
+    const height = Math.max(160, data.length * (series.length * 14 + 12) + 60);
     return (
       <div data-testid="chart-bar">
         <ResponsiveContainer width="100%" height={height}>
           <BarChart
-            data={rows}
+            data={data}
             layout="vertical"
             margin={{ top: 4, right: 24, bottom: 4, left: 4 }}
             barGap={2}

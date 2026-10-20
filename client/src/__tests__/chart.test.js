@@ -97,3 +97,39 @@ describe('pickChart', () => {
     expect(seriesColor(12)).toBe('var(--series-8)');
   });
 });
+
+describe('pickChart with a single wide row', () => {
+  const row = {
+    airline: 'DL',
+    totalDelayMin: 1000,
+    carrierShare: 44.7,
+    weatherShare: 4.3,
+    securityShare: 0.1,
+  };
+
+  test('pivots hinted share columns into a pie', () => {
+    const choice = pickChart({
+      rows: [row],
+      chartType: 'pie',
+      yFields: ['carrierShare', 'weatherShare', 'securityShare'],
+    });
+    expect(choice).toMatchObject({ type: 'pie', xField: 'label', yFields: ['value'] });
+    expect(choice.rows).toEqual([
+      { label: 'Carrier share', value: 44.7 },
+      { label: 'Weather share', value: 4.3 },
+      { label: 'Security share', value: 0.1 },
+    ]);
+  });
+
+  test('pivots into bars when a pie does not fit', () => {
+    const choice = pickChart({ rows: [{ a: 5, b: -2 }], chartType: 'pie', yFields: ['a', 'b'] });
+    expect(choice.type).toBe('bar');
+  });
+
+  test('keeps the stat tile without multiple hinted fields', () => {
+    expect(
+      pickChart({ rows: [{ totalFlights: 362289 }], chartType: 'table', yFields: ['totalFlights'] })
+        .type,
+    ).toBe('stat');
+  });
+});
