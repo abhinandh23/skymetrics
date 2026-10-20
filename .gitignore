@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Build / coverage
+dist/
+build/
+coverage/
+.coverage
+htmlcov/
+
+# Data (raw downloads are never committed)
+data/
+pipeline/data/
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Personal notes
+notes/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.log
